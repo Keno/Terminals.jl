@@ -183,11 +183,8 @@ module Terminals
 
         global curses_colors
 
-        ncurses_h = dlopen("/Users/keno/Documents/src/ncurses-5.9/lib/libncursesw")
-        #ncurses_h=dlopen("libncurses")
-        ccall(:add_library_mapping,Int32,(Ptr{Uint8},Ptr{Uint8}),"libncurses",ncurses_h)
-        ccall(:add_library_mapping,Int32,(Ptr{Uint8},Ptr{Uint8}),"libpanel",
-            dlopen("/Users/keno/Documents/src/ncurses-5.9/lib/libpanelw"))
+        ncurses_h = dlopen("libncurses")
+        
         # Libraries
         const ncurses = :libncurses
         const panel = :libpanel
