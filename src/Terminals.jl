@@ -446,7 +446,7 @@ module Terminals
         cmove_line_down(t::UnixTerminal,n) = (cmove_down(t,n);cmove_col(t,0))
         cmove_col(t::UnixTerminal,n) = write(t.in_stream,"$(CSI)$(n)G")
 
-        raw!(t::UnixTerminal,raw::Bool) = uv_error("raw!",ccall(:uv_tty_set_mode,Int32,(Ptr{Void},Int32),t.in_stream.handle,raw?1:0)==-1)
+        raw!(t::UnixTerminal,raw::Bool) = ccall(:uv_tty_set_mode,Int32,(Ptr{Void},Int32),t.in_stream.handle,raw?1:0)!=-1
 
         function size(t::UnixTerminal)
             s = Array(Int32,2)
