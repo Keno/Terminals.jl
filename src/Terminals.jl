@@ -191,7 +191,7 @@ module Terminals
         cmove_line_down(t::UnixTerminal,n) = (cmove_down(t,n);cmove_col(t,0))
         cmove_col(t::UnixTerminal,n) = write(t.out_stream,"$(CSI)$(n)G")
 
-        raw!(t::UnixTerminal,raw::Bool) = ccall(:uv_tty_set_mode,Int32,(Ptr{Void},Int32),t.out_stream.handle,raw?1:0)!=-1
+        raw!(t::UnixTerminal,raw::Bool) = ccall(:uv_tty_set_mode,Int32,(Ptr{Void},Int32),t.in_stream.handle,raw?1:0)!=-1
 
         function size(t::UnixTerminal)
             s = Array(Int32,2)
@@ -204,6 +204,6 @@ module Terminals
         beep(t::UnixTerminal) = write(t.err_stream,"\x7")
 
         write(t::UnixTerminal,args...) = write(t.out_stream,args...)
-        read(t::UnixTerminal,args...) = read(t.out_stream,args...)
+        read(t::UnixTerminal,args...) = read(t.in_stream,args...)
     end
 end
