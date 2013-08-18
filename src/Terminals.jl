@@ -183,15 +183,15 @@ module Terminals
 
         const CSI = "\x1b["
 
-        cmove_up(t::UnixTerminal,n) = write(t.in_stream,"$(CSI)$(n)A")
-        cmove_down(t::UnixTerminal,n) = write(t.in_stream,"$(CSI)$(n)B")
-        cmove_right(t::UnixTerminal,n) = write(t.in_stream,"$(CSI)$(n)C")
-        cmove_left(t::UnixTerminal,n) = write(t.in_stream,"$(CSI)$(n)D")
+        cmove_up(t::UnixTerminal,n) = write(t.out_stream,"$(CSI)$(n)A")
+        cmove_down(t::UnixTerminal,n) = write(t.out_stream,"$(CSI)$(n)B")
+        cmove_right(t::UnixTerminal,n) = write(t.out_stream,"$(CSI)$(n)C")
+        cmove_left(t::UnixTerminal,n) = write(t.out_stream,"$(CSI)$(n)D")
         cmove_line_up(t::UnixTerminal,n) = (cmove_up(t,n);cmove_col(t,0))
         cmove_line_down(t::UnixTerminal,n) = (cmove_down(t,n);cmove_col(t,0))
-        cmove_col(t::UnixTerminal,n) = write(t.in_stream,"$(CSI)$(n)G")
+        cmove_col(t::UnixTerminal,n) = write(t.out_stream,"$(CSI)$(n)G")
 
-        raw!(t::UnixTerminal,raw::Bool) = ccall(:uv_tty_set_mode,Int32,(Ptr{Void},Int32),t.in_stream.handle,raw?1:0)!=-1
+        raw!(t::UnixTerminal,raw::Bool) = ccall(:uv_tty_set_mode,Int32,(Ptr{Void},Int32),t.out_stream.handle,raw?1:0)!=-1
 
         function size(t::UnixTerminal)
             s = Array(Int32,2)
@@ -199,11 +199,11 @@ module Terminals
             Size(s[1],s[2])
         end
 
-        clear(t::UnixTerminal) = write(t.in_stream,"\x1b[H\x1b[2J")
-        clear_line(t::UnixTerminal) = write(t.in_stream,"\x1b[0G\x1b[0K")
+        clear(t::UnixTerminal) = write(t.out_stream,"\x1b[H\x1b[2J")
+        clear_line(t::UnixTerminal) = write(t.out_stream,"\x1b[0G\x1b[0K")
         beep(t::UnixTerminal) = write(t.err_stream,"\x7")
 
         write(t::UnixTerminal,args...) = write(t.out_stream,args...)
-        read(t::UnixTerminal,args...) = read(t.in_stream,args...)
+        read(t::UnixTerminal,args...) = read(t.out_stream,args...)
     end
 end
