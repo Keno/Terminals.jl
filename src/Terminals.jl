@@ -52,13 +52,6 @@ module Terminals
     hascolor(::TextTerminal) = false
 
     # Utility Functions
-    function write{T}(t::TextTerminal, b::Array{T})
-        if isbits(T)
-            write(t,reinterpret(Uint8,b))
-        else
-            invoke(write, (IO, Array), s, a)
-        end
-    end
     function writepos{T}(t::TextTerminal, x, y, b::Array{T})
         if isbits(T)
             writepos(t,x,y,reinterpret(Uint8,b))
@@ -172,7 +165,7 @@ module Terminals
 
         import Terminals: width, height, cmove, Rect, Size, getX, 
                           getY, raw!, clear_line, beep
-        import Base: size, read, write, flush, TTY
+        import Base: size, read, write, flush, TTY, writemime
 
         type UnixTerminal <: TextTerminal
             term_type
@@ -195,7 +188,7 @@ module Terminals
 
         function size(t::UnixTerminal)
             s = Array(Int32,2)
-            uv_error("size (TTY)",ccall(:uv_tty_get_winsize,Int32,(Ptr{Void},Ptr{Int32},Ptr{Int32}),t.out_stream.handle,pointer(s,1),pointer(s,2))!=0)
+            Base.uv_error("size (TTY)",ccall(:uv_tty_get_winsize,Int32,(Ptr{Void},Ptr{Int32},Ptr{Int32}),t.out_stream.handle,pointer(s,1),pointer(s,2))!=0)
             Size(s[1],s[2])
         end
 
@@ -203,7 +196,13 @@ module Terminals
         clear_line(t::UnixTerminal) = write(t.out_stream,"\x1b[0G\x1b[0K")
         beep(t::UnixTerminal) = write(t.err_stream,"\x7")
 
-        write(t::UnixTerminal,args...) = write(t.out_stream,args...)
-        read(t::UnixTerminal,args...) = read(t.in_stream,args...)
+        write{T,N}(t::UnixTerminal,a::Array{T,N}) = write(t.out_stream,a)
+        write(t::UnixTerminal,p::Ptr{Uint8}) = write(t.out_stream,p)
+        write(t::UnixTerminal,p::Ptr{Uint8},x) = write(t.out_stream,p,x)
+        write(t::UnixTerminal,x::Uint8) = write(t.out_stream,x)
+        read{T,N}(t::UnixTerminal,x::Array{T,N}) = read(t.in_stream,x)
+        read(t::UnixTerminal,::Type{Uint8}) = read(t.in_stream,Uint8)
+
+        #writemime(t::UnixTerminal, ::MIME"text/plain", x) = writemime(t.out_stream, MIME("text/plain"), x)
     end
 end
