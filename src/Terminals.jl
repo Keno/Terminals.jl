@@ -198,7 +198,7 @@ module Terminals
 
         write{T,N}(t::UnixTerminal,a::Array{T,N}) = write(t.out_stream,a)
         write(t::UnixTerminal,p::Ptr{Uint8}) = write(t.out_stream,p)
-        write(t::UnixTerminal,p::Ptr{Uint8},x) = write(t.out_stream,p,x)
+        write(t::UnixTerminal,p::Ptr{Uint8},x::Integer) = write(t.out_stream,p,x)
         write(t::UnixTerminal,x::Uint8) = write(t.out_stream,x)
         read{T,N}(t::UnixTerminal,x::Array{T,N}) = read(t.in_stream,x)
         read(t::UnixTerminal,::Type{Uint8}) = read(t.in_stream,Uint8)
