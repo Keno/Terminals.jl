@@ -1,7 +1,7 @@
 module Terminals
     import Base.size, Base.write, Base.flush
     abstract TextTerminal <: Base.IO
-    export TextTerminal, NCurses, writepos, cmove, pos, getX, getY
+    export TextTerminal, NCurses, writepos, cmove, pos, getX, getY, hascolor
 
     # Stuff that really should be in a Geometry package
     immutable Rect
@@ -164,7 +164,7 @@ module Terminals
         importall Terminals
 
         import Terminals: width, height, cmove, Rect, Size, getX, 
-                          getY, raw!, clear_line, beep
+                          getY, raw!, clear_line, beep, hascolor
         import Base: size, read, write, flush, TTY, writemime
 
         type UnixTerminal <: TextTerminal
@@ -203,6 +203,8 @@ module Terminals
         read{T,N}(t::UnixTerminal,x::Array{T,N}) = read(t.in_stream,x)
         read(t::UnixTerminal,::Type{Uint8}) = read(t.in_stream,Uint8)
 
+
+        hascolor(t::UnixTerminal) = (beginswith(t.term_type,"xterm") || success(`tput setaf 0`))
         #writemime(t::UnixTerminal, ::MIME"text/plain", x) = writemime(t.out_stream, MIME("text/plain"), x)
     end
 end
