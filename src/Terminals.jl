@@ -164,7 +164,7 @@ module Terminals
         importall Terminals
 
         import Terminals: width, height, cmove, Rect, Size, getX, 
-                          getY, raw!, clear_line, beep, hascolor
+                          getY, raw!, clear, clear_line, beep, hascolor
         import Base: size, read, write, flush, TTY, writemime
 
         type UnixTerminal <: TextTerminal
