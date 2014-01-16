@@ -165,7 +165,7 @@ module Terminals
 
         import Terminals: width, height, cmove, Rect, Size, getX, 
                           getY, raw!, clear, clear_line, beep, hascolor
-        import Base: size, read, write, flush, TTY, writemime, readuntil
+        import Base: size, read, write, flush, TTY, writemime, readuntil, start_reading, stop_reading
 
         export UnixTerminal
 
@@ -209,6 +209,8 @@ module Terminals
         readuntil(t::UnixTerminal,c::Char) = readuntil(t.in_stream,c) 
         readuntil(t::UnixTerminal,s) = readuntil(t.in_stream,s)
         read(t::UnixTerminal,::Type{Uint8}) = read(t.in_stream,Uint8)
+        start_reading(t::UnixTerminal) = start_reading(t.in_stream)
+        stop_reading(t::UnixTerminal) = stop_reading(t.in_stream)
 
 
         hascolor(t::UnixTerminal) = (beginswith(t.term_type,"xterm") || success(`tput setaf 0`))
