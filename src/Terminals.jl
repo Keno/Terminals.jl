@@ -165,7 +165,9 @@ module Terminals
 
         import Terminals: width, height, cmove, Rect, Size, getX, 
                           getY, raw!, clear, clear_line, beep, hascolor
-        import Base: size, read, write, flush, TTY, writemime
+        import Base: size, read, write, flush, TTY, writemime, readuntil
+
+        export UnixTerminal
 
         type UnixTerminal <: TextTerminal
             term_type
@@ -185,6 +187,8 @@ module Terminals
         cmove_col(t::UnixTerminal,n) = write(t.out_stream,"$(CSI)$(n)G")
 
         raw!(t::UnixTerminal,raw::Bool) = ccall(:uv_tty_set_mode,Int32,(Ptr{Void},Int32),t.in_stream.handle,raw?1:0)!=-1
+        enable_bracketed_paste(t::UnixTerminal) = write(t.out_stream,"$(CSI)?2004h")
+        disable_bracketed_paste(t::UnixTerminal) = write(t.out_stream,"$(CSI)?2004l")
 
         function size(t::UnixTerminal)
             s = Array(Int32,2)
@@ -201,10 +205,15 @@ module Terminals
         write(t::UnixTerminal,p::Ptr{Uint8},x::Integer) = write(t.out_stream,p,x)
         write(t::UnixTerminal,x::Uint8) = write(t.out_stream,x)
         read{T,N}(t::UnixTerminal,x::Array{T,N}) = read(t.in_stream,x)
+        readuntil(t::UnixTerminal,s::String) = readuntil(t.in_stream,s)
+        readuntil(t::UnixTerminal,c::Char) = readuntil(t.in_stream,c) 
+        readuntil(t::UnixTerminal,s) = readuntil(t.in_stream,s)
         read(t::UnixTerminal,::Type{Uint8}) = read(t.in_stream,Uint8)
 
 
         hascolor(t::UnixTerminal) = (beginswith(t.term_type,"xterm") || success(`tput setaf 0`))
         #writemime(t::UnixTerminal, ::MIME"text/plain", x) = writemime(t.out_stream, MIME("text/plain"), x)
     end
+    importall .Unix
+    export UnixTerminal
 end
