@@ -205,7 +205,7 @@ module Terminals
         write(t::UnixTerminal,p::Ptr{Uint8},x::Integer) = write(t.out_stream,p,x)
         write(t::UnixTerminal,x::Uint8) = write(t.out_stream,x)
         read{T,N}(t::UnixTerminal,x::Array{T,N}) = read(t.in_stream,x)
-        readuntil(t::UnixTerminal,s::String) = readuntil(t.in_stream,s)
+        readuntil(t::UnixTerminal,s::AbstractString) = readuntil(t.in_stream,s)
         readuntil(t::UnixTerminal,c::Char) = readuntil(t.in_stream,c) 
         readuntil(t::UnixTerminal,s) = readuntil(t.in_stream,s)
         read(t::UnixTerminal,::Type{Uint8}) = read(t.in_stream,Uint8)
